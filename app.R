@@ -388,7 +388,7 @@ server <- function(input, output) {
       filter(crimeType == input$selectCrime) %>%
       filter(`AREA NAME` == input$selectArea) %>%
       filter(LON != 0 & LAT != 0) %>%
-      filter(race != "unknown") %>%
+      #filter(race != "unknown") %>%
       filter(!is.na(race))
     
     ggplot(z) +

@@ -160,7 +160,7 @@ ui <- fluidPage(
                absolutePanel(
                  selectInput("selectArea",
                              h5("Area"),
-                             choice = area,
+                             choice = areaN,
                              selected = 1),
                  id = "tscrime", class = "panel panel-default",
                  top = 110, right = 30, width = 200, fixed = F,
@@ -358,84 +358,157 @@ server <- function(input, output) {
   })
   
   output$areaMap <- renderPlot({
-    z = myCrime %>%
-      filter(crimeType == input$selectCrime) %>%
-      filter(`AREA NAME` == input$selectArea) %>%
-      filter(LON != 0 & LAT != 0) %>%
-      filter(!is.na(race))
-    # sample_frac(input$slider / 100)
-    gmap = get_googlemap(center = c(x = as.numeric(cood[cood$`AREA NAME` ==  input$selectArea, ][2]),
-                                    y = as.numeric(cood[cood$`AREA NAME` == input$selectArea, ][3]))
-                         , zoom = 13) %>%
-      ggmap()
     
-    gmap +
-      geom_jitter(data = z,
-                  aes(x = LON, y = LAT, color = race), width = 0.001, height = 0.001) +
-      scale_color_manual(values = rev(as.vector(alphabet(20)))) +
-      labs(title = "Mapping of the crime location") +
-      theme(legend.position = "bottom",
-            text = element_text(size = 15, color = "white"),
-            legend.title = element_blank(),
-            axis.text = element_text(size = 10)) 
-    
+    if (input$selectArea == "LosAngeles") {
+      z = myCrime %>%
+        filter(crimeType == input$selectCrime) %>%
+        filter(LON != 0 & LAT != 0) %>%
+        filter(!is.na(race))
+      
+      gmap = get_googlemap(center = "los Angeles") %>%
+        ggmap()
+      
+      gmap +
+        geom_point(data = z,
+                    aes(x = LON, y = LAT, color = race), alpha = 0.25, size = 0.5) +
+        scale_color_manual(values = rev(as.vector(alphabet(20)))) +
+        labs(title = "Mapping of the crime location") +
+        theme(legend.position = "bottom",
+              text = element_text(size = 15, color = "white"),
+              legend.title = element_blank(),
+              axis.text = element_text(size = 10)) 
+      
+    } else {
+      z = myCrime %>%
+        filter(crimeType == input$selectCrime) %>%
+        filter(`AREA NAME` == input$selectArea) %>%
+        filter(LON != 0 & LAT != 0) %>%
+        filter(!is.na(race))
+      # sample_frac(input$slider / 100)
+      gmap = get_googlemap(center = c(x = as.numeric(cood[cood$`AREA NAME` ==  input$selectArea, ][2]),
+                                      y = as.numeric(cood[cood$`AREA NAME` == input$selectArea, ][3]))
+                           , zoom = 13) %>%
+        ggmap()
+      
+      gmap +
+        geom_jitter(data = z,
+                    aes(x = LON, y = LAT, color = race), width = 0.001, height = 0.001) +
+        scale_color_manual(values = rev(as.vector(alphabet(20)))) +
+        labs(title = "Mapping of the crime location") +
+        theme(legend.position = "bottom",
+              text = element_text(size = 15, color = "white"),
+              legend.title = element_blank(),
+              axis.text = element_text(size = 10)) 
+    }
   },
   {width = 600},
   {height = 550}) 
   
   output$raceBar <- renderPlot({
-    z = myCrime %>%
-      filter(crimeType == input$selectCrime) %>%
-      filter(`AREA NAME` == input$selectArea) %>%
-      filter(LON != 0 & LAT != 0) %>%
-      filter(race != "unknown") %>%
-      filter(!is.na(race))
-    
-    ggplot(z) +
-      geom_bar(mapping = aes(x = fct_infreq(race), fill = race), stat = "count") +
-      scale_fill_manual(values = rev(as.vector(alphabet(20)))) +
-      labs(x = "race", title = "Victim count by race") +
-      theme(text = element_text(color = "white", size = 15),
-            axis.text.x = element_text(angle = 30, size = 10),
-            axis.text = element_text(size = 10))
+    if (input$selectArea == "LosAngeles") {
+      print("hello")
+      z = myCrime %>%
+        filter(crimeType == input$selectCrime) %>%
+        filter(LON != 0 & LAT != 0) %>%
+        filter(race != "unknown") %>%
+        filter(!is.na(race))
+      
+      ggplot(z) +
+        geom_bar(mapping = aes(x = fct_infreq(race), fill = race), stat = "count") +
+        scale_fill_manual(values = rev(as.vector(alphabet(20)))) +
+        labs(x = "race", title = "Victim count by race") +
+        theme(text = element_text(color = "white", size = 15),
+              axis.text.x = element_text(angle = 30, size = 10),
+              axis.text = element_text(size = 10))
+    } else {
+      z = myCrime %>%
+        filter(crimeType == input$selectCrime) %>%
+        filter(`AREA NAME` == input$selectArea) %>%
+        filter(LON != 0 & LAT != 0) %>%
+        filter(race != "unknown") %>%
+        filter(!is.na(race))
+      
+      ggplot(z) +
+        geom_bar(mapping = aes(x = fct_infreq(race), fill = race), stat = "count") +
+        scale_fill_manual(values = rev(as.vector(alphabet(20)))) +
+        labs(x = "race", title = "Victim count by race") +
+        theme(text = element_text(color = "white", size = 15),
+              axis.text.x = element_text(angle = 30, size = 10),
+              axis.text = element_text(size = 10))
+    }
   })
   
   output$genderPie <- renderPlot({
-    z = myCrime %>%
-      filter(crimeType == input$selectCrime) %>%
-      filter(`AREA NAME` == input$selectArea) %>%
-      filter(LON != 0 & LAT != 0) %>%
-      filter(`Vict Sex` == "F" | `Vict Sex` == "M") %>%
-      filter(!is.na(race))
-    
-    ggplot(z) +
-      geom_bar(mapping = aes(x = "", fill = `Vict Sex`), stat = "count", color = "white",
-               width = 1) +
-      coord_polar(theta = 'y') +
-      scale_fill_manual(values = as.vector(alphabet(20))) +
-      labs(title = "Victim count by gender") +
-      theme(axis.ticks = element_blank(),
-            axis.text = element_blank(),
-            panel.grid = element_blank(),
-            axis.title.y = element_blank(),
-            axis.title.x = element_blank(),
-            text = element_text(size = 15, color = "white"))
+    if (input$selectArea == "LosAngeles") {
+      z = myCrime %>%
+        filter(crimeType == input$selectCrime) %>%
+        filter(LON != 0 & LAT != 0) %>%
+        filter(`Vict Sex` == "F" | `Vict Sex` == "M") %>%
+        filter(!is.na(race))
+      
+      ggplot(z) +
+        geom_bar(mapping = aes(x = "", fill = `Vict Sex`), stat = "count", color = "white",
+                 width = 1) +
+        coord_polar(theta = 'y') +
+        scale_fill_manual(values = as.vector(alphabet(20))) +
+        labs(title = "Victim count by gender") +
+        theme(axis.ticks = element_blank(),
+              axis.text = element_blank(),
+              panel.grid = element_blank(),
+              axis.title.y = element_blank(),
+              axis.title.x = element_blank(),
+              text = element_text(size = 15, color = "white"))
+    } else {
+      z = myCrime %>%
+        filter(crimeType == input$selectCrime) %>%
+        filter(`AREA NAME` == input$selectArea) %>%
+        filter(LON != 0 & LAT != 0) %>%
+        filter(`Vict Sex` == "F" | `Vict Sex` == "M") %>%
+        filter(!is.na(race))
+      
+      ggplot(z) +
+        geom_bar(mapping = aes(x = "", fill = `Vict Sex`), stat = "count", color = "white",
+                 width = 1) +
+        coord_polar(theta = 'y') +
+        scale_fill_manual(values = as.vector(alphabet(20))) +
+        labs(title = "Victim count by gender") +
+        theme(axis.ticks = element_blank(),
+              axis.text = element_blank(),
+              panel.grid = element_blank(),
+              axis.title.y = element_blank(),
+              axis.title.x = element_blank(),
+              text = element_text(size = 15, color = "white"))
+    }
     
   }) 
   
   output$ageHistogram <- renderPlot({
-    z = myCrime %>%
-      filter(crimeType == input$selectCrime) %>%
-      filter(`AREA NAME` == input$selectArea) %>%
-      filter(LON != 0 & LAT != 0) %>%
-      filter(`Vict Age` != 0) %>%
-      filter(!is.na(race))
-    
-    ggplot(z) +
-      geom_histogram(mapping = aes(x = `Vict Age`), fill = "lightgreen", binwidth = 1) +
-      labs(title = "Age distribution of victims") +
-      theme(text = element_text(color = "white", size = 15), 
-             axis.text = element_text(size = 10))
+    if (input$selectArea == "LosAngeles") {
+      z = myCrime %>%
+        filter(crimeType == input$selectCrime) %>%
+        filter(LON != 0 & LAT != 0) %>%
+        filter(`Vict Age` != 0) %>%
+        filter(!is.na(race))
+      
+      ggplot(z) +
+        geom_histogram(mapping = aes(x = `Vict Age`), fill = "lightgreen", binwidth = 1) +
+        labs(title = "Age distribution of victims") +
+        theme(text = element_text(color = "white", size = 15), 
+              axis.text = element_text(size = 10))
+    } else {
+      z = myCrime %>%
+        filter(crimeType == input$selectCrime) %>%
+        filter(`AREA NAME` == input$selectArea) %>%
+        filter(LON != 0 & LAT != 0) %>%
+        filter(`Vict Age` != 0) %>%
+        filter(!is.na(race))
+      
+      ggplot(z) +
+        geom_histogram(mapping = aes(x = `Vict Age`), fill = "lightgreen", binwidth = 1) +
+        labs(title = "Age distribution of victims") +
+        theme(text = element_text(color = "white", size = 15), 
+              axis.text = element_text(size = 10))
+    }
   })
   
   

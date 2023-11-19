@@ -94,6 +94,7 @@ areas = myCrime %>%
 act = unique(myCrime$crimeType)
 choiceAct = setNames(1:9, act)
 area = unique(myCrime$`AREA NAME`)
+areaN = append("LosAngeles", area)
 
 ###########################################
 

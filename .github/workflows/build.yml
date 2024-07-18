@@ -15,7 +15,7 @@ jobs:
       - name: install the glcoud cli
         uses: google-github-actions/setup-gcloud@v0
         with:
-          project-id: ${{ secrets.GOOGLE_PROJECT }}
+          project_id: ${{ secrets.GOOGLE_PROJECT }}
           service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
           export_default_credentials: true
 

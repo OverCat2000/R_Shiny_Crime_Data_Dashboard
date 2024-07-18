@@ -22,7 +22,7 @@ jobs:
       - name: build and push docker image
         env:
           GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
-        run: |
+        run: |-
           gcloud auth configure-docker asia-south1-docker.pkg.dev
-          docker build -t asia-south1-docker.pkg.dev/master-purpose-428704-c8/shiny-repo/docker-shiny:latest .
+          docker build -t asia-south1-docker.pkg.dev/master-purpose-428704-c8/shiny-repo/docker-shiny:latest
           docker push asia-south1-docker.pkg.dev/master-purpose-428704-c8/shiny-repo/docker-shiny:latest

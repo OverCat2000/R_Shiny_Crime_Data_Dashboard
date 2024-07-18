@@ -15,8 +15,8 @@ jobs:
       - name: Install the gcloud CLI
         uses: google-github-actions/setup-gcloud@v1
         with:
-          project_id: ${{ secrets.GOOGLE_PROJECT }}
-          service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
 
       - name: Configure Docker client
@@ -31,17 +31,17 @@ jobs:
 
       - name: Test push to Artifact Registry
         env:
-          GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         run: |
           echo "FROM scratch" > Dockerfile.test
-          docker build -t asia-south1-docker.pkg.dev/$GOOGLE_PROJECT/shiny-repo/test-image:latest -f Dockerfile.test .
-          docker push asia-south1-docker.pkg.dev/$GOOGLE_PROJECT/shiny-repo/test-image:latest
-          docker rmi asia-south1-docker.pkg.dev/$GOOGLE_PROJECT/shiny-repo/test-image:latest
+          docker build -t asia-south1-docker.pkg.dev/$GCP_PROJECT_ID/my-shiny-app-repo/test-image:latest -f Dockerfile.test .
+          docker push asia-south1-docker.pkg.dev/$GCP_PROJECT_ID/my-shiny-app-repo/test-image:latest
+          docker rmi asia-south1-docker.pkg.dev/$GCP_PROJECT_ID/my-shiny-app-repo/test-image:latest
           rm Dockerfile.test
 
       - name: Build and push Docker image
         env:
-          GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         run: |
-          docker build -t asia-south1-docker.pkg.dev/$GOOGLE_PROJECT/shiny-repo/docker-shiny:latest .
-          docker push asia-south1-docker.pkg.dev/$GOOGLE_PROJECT/shiny-repo/docker-shiny:latest
+          docker build -t asia-south1-docker.pkg.dev/$GCP_PROJECT_ID/my-shiny-app-repo/my-shiny-app:latest .
+          docker push asia-south1-docker.pkg.dev/$GCP_PROJECT_ID/my-shiny-app-repo/my-shiny-app:latest

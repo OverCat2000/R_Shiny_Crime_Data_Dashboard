@@ -9,23 +9,39 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: code checkout
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: install the glcoud cli
-        uses: google-github-actions/setup-gcloud@v2
+      - name: Install the gcloud CLI
+        uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: ${{ secrets.GOOGLE_PROJECT }}
           service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
           export_default_credentials: true
 
-      - name: configure docker client
-        run: |-
-          gcloud auth configure-docker --quiet
+      - name: Configure Docker client
+        run: gcloud auth configure-docker --quiet
 
-      - name: build and push docker image
+      - name: Verify authentication and project details
+        run: |
+          echo "Authenticated accounts:"
+          gcloud auth list
+          echo "Configured project:"
+          gcloud config list project
+
+      - name: Test push to Artifact Registry
         env:
           GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
-        run: |-
+        run: |
+          echo "FROM scratch" > Dockerfile.test
+          docker build -t asia-south1-docker.pkg.dev/$GOOGLE_PROJECT/shiny-repo/test-image:latest -f Dockerfile.test .
+          docker push asia-south1-docker.pkg.dev/$GOOGLE_PROJECT/shiny-repo/test-image:latest
+          docker rmi asia-south1-docker.pkg.dev/$GOOGLE_PROJECT/shiny-repo/test-image:latest
+          rm Dockerfile.test
+
+      - name: Build and push Docker image
+        env:
+          GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+        run: |
           docker build -t asia-south1-docker.pkg.dev/$GOOGLE_PROJECT/shiny-repo/docker-shiny:latest .
           docker push asia-south1-docker.pkg.dev/$GOOGLE_PROJECT/shiny-repo/docker-shiny:latest

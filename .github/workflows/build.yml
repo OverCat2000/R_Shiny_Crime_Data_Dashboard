@@ -19,10 +19,13 @@ jobs:
           service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
           export_default_credentials: true
 
+      - name: configure docker client
+        run: |-
+          gcloud auth configure-docker --quiet
+
       - name: build and push docker image
         env:
           GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
         run: |-
-          gcloud auth configure-docker asia-south1-docker.pkg.dev
-          docker build -t asia-south1-docker.pkg.dev/master-purpose-428704-c8/shiny-repo/docker-shiny:latest .
-          docker push asia-south1-docker.pkg.dev/master-purpose-428704-c8/shiny-repo/docker-shiny:latest
+          docker build -t asia-south1-docker.pkg.dev/$GOOGLE_PROJECT/shiny-repo/docker-shiny:latest .
+          docker push asia-south1-docker.pkg.dev/$GOOGLE_PROJECT/shiny-repo/docker-shiny:latest

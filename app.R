@@ -16,8 +16,9 @@ library(ggrepel)
 library(shinyWidgets)
 
 load(".RData")
-
-ggmap::register_google(key = "AIzaSyDllBZsZNAF0eKiEl532d5KN_5P_6iIcSc", write = TRUE)
+# "AIzaSyDllBZsZNAF0eKiEl532d5KN_5P_6iIcSc"
+api_key = Sys.getenv("API_KEY")
+ggmap::register_google(key = api_key, write = TRUE)
 
 thematic::thematic_on()
 

@@ -20,19 +20,6 @@ jobs:
       - name: Configure Docker client
         run: gcloud auth configure-docker asia-south1-docker.pkg.dev
 
-      - name: Verify authentication and project details
-        run: |
-          echo "Authenticated accounts:"
-          gcloud auth list
-          echo "Configured project:"
-          gcloud config list project
-        
-      - name: Print API key (for debugging purposes)
-        env:
-          API_KEY: ${{ secrets.API_KEY }}
-        run: |
-          echo "API Key: $API_KEY"
-
       - name: Test push to Artifact Registry
         env:
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
@@ -50,3 +37,11 @@ jobs:
         run: |
           docker build --build-arg API_KEY=$API_KEY -t asia-south1-docker.pkg.dev/$GCP_PROJECT_ID/my-shiny-app-repo/my-shiny-app:latest .
           docker push asia-south1-docker.pkg.dev/$GCP_PROJECT_ID/my-shiny-app-repo/my-shiny-app:latest
+
+      - name: deploy to gke
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: |
+          gcloud container clusters get-credentials autopilot-cluster-1 --region asia-south1
+          sed -i "s/GCP_PROJECT_ID/$GCP_PROJECT_ID/g" resources.yaml
+          kubectl apply -f resources.yaml

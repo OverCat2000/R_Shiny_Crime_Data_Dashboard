@@ -16,7 +16,7 @@ library(ggrepel)
 library(shinyWidgets)
 
 load(".RData")
-# "AIzaSyDllBZsZNAF0eKiEl532d5KN_5P_6iIcSc"
+
 api_key = Sys.getenv("API_KEY")
 ggmap::register_google(key = api_key, write = TRUE)
 

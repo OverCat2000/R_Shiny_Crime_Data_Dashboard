@@ -41,5 +41,5 @@ jobs:
         env:
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         run: |
-          docker build -t asia-south1-docker.pkg.dev/$GCP_PROJECT_ID/my-shiny-app-repo/my-shiny-app:latest .
+          docker build --build-arg API_KEY=${API_KEY} -t asia-south1-docker.pkg.dev/$GCP_PROJECT_ID/my-shiny-app-repo/my-shiny-app:latest .
           docker push asia-south1-docker.pkg.dev/$GCP_PROJECT_ID/my-shiny-app-repo/my-shiny-app:latest

@@ -20,6 +20,11 @@ jobs:
       - name: Configure Docker client
         run: gcloud auth configure-docker asia-south1-docker.pkg.dev
 
+      - name: Check kubectl configuration
+        run: |
+          gcloud container clusters get-credentials autopilot-cluster-1 --region asia-south1
+          kubectl get nodes
+
       - name: Test push to Artifact Registry
         env:
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}

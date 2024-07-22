@@ -24,6 +24,4 @@ VOLUME ["/home/shiny-app"]
 
 EXPOSE 8180
 
-
-
 CMD R -e "shiny::runApp('/home/shiny-app/app.R', host='0.0.0.0', port=8180)"
